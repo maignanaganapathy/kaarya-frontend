@@ -1,0 +1,17 @@
+@import '../styles/variables.scss';
+
+.callbackContainer {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: $dark-bg;
+  gap: 24px;
+}
+
+.message {
+  font-size: 18px;
+  color: $dark-text;
+  font-weight: 500;
+}

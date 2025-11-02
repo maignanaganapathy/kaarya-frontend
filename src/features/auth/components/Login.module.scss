@@ -1,0 +1,71 @@
+@import '../../../styles/variables.scss';
+
+.loginContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $dark-bg;
+  padding: 20px;
+}
+
+.loginCard {
+  background-color: $dark-surface;
+  border-radius: $border-radius;
+  padding: 48px 40px;
+  box-shadow: $box-shadow;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+}
+
+.logoSection {
+  margin-bottom: 40px;
+}
+
+.logo {
+  font-size: 48px;
+  font-weight: 700;
+  color: $primary-color;
+  margin-bottom: 8px;
+  letter-spacing: -1px;
+}
+
+.tagline {
+  font-size: 16px;
+  color: $dark-text-secondary;
+}
+
+.loginSection {
+  margin-top: 32px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 600;
+  color: $dark-text;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: $dark-text-secondary;
+  margin-bottom: 32px;
+}
+
+.googleButton {
+  background-color: $primary-color !important;
+  color: $dark-bg !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  padding: 12px 24px !important;
+  font-size: 16px !important;
+  border-radius: $border-radius !important;
+  transition: $transition !important;
+
+  &:hover {
+    background-color: $primary-hover !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(255, 215, 0, 0.3) !important;
+  }
+}
