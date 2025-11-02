@@ -2,12 +2,16 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  picture?: string;
+  profilePicture?: string;
+}
+export interface Token {
+  accessToken: string;
+  refreshToken: string;
 }
 
 export interface AuthResponse {
   data: {
-    token: string;
+    tokens: Token;
     user: User;
   };
   success: boolean;

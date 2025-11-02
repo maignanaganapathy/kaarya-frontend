@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
 import { toast } from 'react-toastify';
@@ -8,16 +8,16 @@ import styles from './AuthCallback.module.scss';
 const AuthCallback = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const hasRun = useRef(false);
 
   useEffect(() => {
+    if (hasRun.current) return;
+    hasRun.current = true;
+
     const handleCallback = async () => {
-      // Get the authorization code from URL
       const urlParams = new URLSearchParams(window.location.search);
-      console.log('urlParams', urlParams);
       const code = urlParams.get('code');
-      console.log('code', code);
       const error = urlParams.get('error');
-      console.log('error', error);
 
       if (error) {
         toast.error('Authentication failed. Please try again.');
@@ -32,10 +32,7 @@ const AuthCallback = () => {
       }
 
       try {
-        // Exchange code for token
-        console.log(code);
         await login(code);
-        // Redirect to home on success
         navigate('/', { replace: true });
       } catch (error) {
         console.error('Authentication error:', error);
@@ -44,7 +41,7 @@ const AuthCallback = () => {
     };
 
     handleCallback();
-  }, []);
+  }, [login, navigate]);
 
   return (
     <div className={styles.callbackContainer}>

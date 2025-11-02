@@ -27,7 +27,7 @@ const Home = () => {
       <div className={styles.content}>
         <div className={styles.welcomeSection}>
           <Avatar
-            src={user?.picture}
+            src={user?.profilePicture}
             alt={user?.name}
             className={styles.avatar}
             sx={{ width: 120, height: 120 }}

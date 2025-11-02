@@ -10,8 +10,13 @@ const authService = {
       redirectUri,
     } as LoginRequest);
 
+    console.log('response', response);
     // Store token and user in localStorage
-    localStorage.setItem('auth_token', response.data.data.token);
+    localStorage.setItem('auth_token', response.data.data.tokens.accessToken);
+    localStorage.setItem(
+      'refresh_token',
+      response.data.data.tokens.refreshToken
+    );
     localStorage.setItem('user', JSON.stringify(response.data.data.user));
 
     return response.data;
@@ -19,14 +24,16 @@ const authService = {
 
   // Get current user info
   getCurrentUser: async (): Promise<User> => {
-    const response = await api.get<{ user: User }>('/auth/me');
-    return response.data.user;
+    const response = await api.get<{ data: User }>('/auth/me');
+    return response.data.data;
   },
 
   // Logout
   logout: async (): Promise<void> => {
     try {
-      await api.post('/auth/logout');
+      await api.post('/auth/logout', {
+        refreshToken: localStorage.getItem('refresh_token'),
+      });
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
