@@ -1,12 +1,24 @@
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
+import { useAuth } from '../context/AuthContext';
 import styles from './Login.module.scss';
 
 const Login = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
   const handleGoogleLogin = () => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
     const redirectUri = import.meta.env.VITE_REDIRECT_URI;
-    const scope = `email%20profile`;
+    const scope = 'email profile';
 
     const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&access_type=offline&prompt=consent`;
 
