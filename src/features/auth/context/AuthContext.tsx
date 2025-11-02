@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { toast } from 'react-toastify';
 import authService from '../services/authService';
@@ -6,15 +6,62 @@ import type { AuthContextType, User } from '../types/auth.types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Token refresh interval: 15 minutes (in milliseconds)
+const TOKEN_REFRESH_INTERVAL = 15 * 60 * 1000; // 15 minutes
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const refreshIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+    null
+  );
 
   // Check authentication on mount
   useEffect(() => {
     checkAuth();
   }, []);
+
+  // Setup token refresh interval when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      startTokenRefreshInterval();
+    } else {
+      stopTokenRefreshInterval();
+    }
+
+    // Cleanup on unmount
+    return () => {
+      stopTokenRefreshInterval();
+    };
+  }, [isAuthenticated]);
+
+  const startTokenRefreshInterval = () => {
+    // Clear any existing interval
+    stopTokenRefreshInterval();
+
+    // Set up new interval to refresh token every 15 minutes
+    refreshIntervalRef.current = setInterval(async () => {
+      try {
+        console.log('⏰ Proactive token refresh triggered');
+        await authService.refreshToken();
+        console.log('✅ Token refreshed successfully');
+      } catch (error) {
+        console.error('❌ Failed to refresh token:', error);
+        logout();
+      }
+    }, TOKEN_REFRESH_INTERVAL);
+
+    console.log('🔄 Token refresh interval started (every 15 minutes)');
+  };
+
+  const stopTokenRefreshInterval = () => {
+    if (refreshIntervalRef.current) {
+      clearInterval(refreshIntervalRef.current);
+      refreshIntervalRef.current = null;
+      console.log('⏸️ Token refresh interval stopped');
+    }
+  };
 
   const checkAuth = async () => {
     try {
@@ -40,6 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setUser(null);
           setIsAuthenticated(false);
           localStorage.removeItem('auth_token');
+          localStorage.removeItem('refresh_token');
           localStorage.removeItem('user');
         }
       } else {
@@ -74,6 +122,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
+    stopTokenRefreshInterval();
     authService.logout();
     setUser(null);
     setIsAuthenticated(false);

@@ -10,7 +10,6 @@ const authService = {
       redirectUri,
     } as LoginRequest);
 
-    console.log('response', response);
     // Store token and user in localStorage
     localStorage.setItem('auth_token', response.data.data.tokens.accessToken);
     localStorage.setItem(
@@ -20,6 +19,24 @@ const authService = {
     localStorage.setItem('user', JSON.stringify(response.data.data.user));
 
     return response.data;
+  },
+
+  refreshToken: async (): Promise<void> => {
+    const refreshToken = localStorage.getItem('refresh_token');
+
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
+    }
+
+    const response = await api.post('/auth/refresh', {
+      refreshToken,
+    });
+
+    const newAccessToken = response.data.data.accessToken;
+
+    localStorage.setItem('auth_token', newAccessToken);
+
+    api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
   },
 
   // Get current user info
@@ -39,6 +56,7 @@ const authService = {
     } finally {
       // Clear local storage regardless of API response
       localStorage.removeItem('auth_token');
+      localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');
     }
   },
